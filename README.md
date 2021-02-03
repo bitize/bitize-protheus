@@ -26,8 +26,10 @@ Esse projeto tem como objetivo integrar uma base do Totvs Microsiga Protheus pad
 - [x] Gerenciamento do Token
 - [x] Método POST
 - [x] Método GET
-- [ ] Método PUT
-- [ ] Método DELETE
+- [x] Método PUT
+- [x] Método DELETE
+- [x] Método GetResponse
+- [x] Método GetError
 
 ### Cadastros
 - [ ] Cadastro de Usuários
