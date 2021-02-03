@@ -31,7 +31,25 @@ Esse projeto tem como objetivo integrar uma base do Totvs Microsiga Protheus pad
 - [x] Método GetResponse
 - [x] Método GetError
 
-### Cadastros
+```clipper
+function Teste()
+local oBitize:= bitize():new() //Instância a classe
+local lRet   := .t.
+local oJson  := JsonObject():new()
+
+lRet:= oBitize:post()
+
+//Faz um GET em https://api.bitize.com.br/consumer-products
+lRet:= oBitize.get('consumer-products')
+
+if lRet
+   conout('Sucesso!')
+endif
+
+return
+```
+
+### Exemplos
 - [ ] Cadastro de Usuários
 - [ ] Cadastro de Compradores
 - [ ] Cadastro de Centros de Custos
@@ -39,3 +57,9 @@ Esse projeto tem como objetivo integrar uma base do Totvs Microsiga Protheus pad
 - [ ] Cadastro de Produtos
 - [ ] Cadastro de Fornecedores
 
+
+## 📝 Licença
+
+Este projeto esta sobe a licença MIT.
+
+Feito com ❤️ por Carlos Tirabassi 👋🏽 [Entre em contato!](https://www.linkedin.com/in/carlostirabassi/)
