@@ -19,3 +19,21 @@
 ## 💻 Integração Protheus x Bitize
 
 Esse projeto tem como objetivo integrar uma base do Totvs Microsiga Protheus padrão com a Plataforma de Gestão de Compras 
+
+### Classe de Integração
+  O objetivo é centralizar a comunicação com a API do Bitize e possui as seguintes funcionalidades:
+
+- [x] Gerenciamento do Token
+- [x] Método POST
+- [x] Método GET
+- [ ] Método PUT
+- [ ] Método DELETE
+
+### Cadastros
+- [ ] Cadastro de Usuários
+- [ ] Cadastro de Compradores
+- [ ] Cadastro de Centros de Custos
+- [ ] Cadastro de Grupos de Produtos
+- [ ] Cadastro de Produtos
+- [ ] Cadastro de Fornecedores
+
