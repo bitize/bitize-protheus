@@ -18,10 +18,12 @@
 
 ## 🚧 Integração Protheus x Bitize 🚧  Em Construção
 
-Esse projeto tem como objetivo integrar uma base do Totvs Microsiga Protheus padrão com a Plataforma de Gestão de Compras 
+Esse projeto tem como objetivo integrar uma base do Totvs Microsiga Protheus padrão com a Plataforma de Gestão de Compras [BITIZE](https://www.bitize.com.br)
 
 ### Classe de Integração
-  O objetivo é centralizar a comunicação com a API do Bitize e possui as seguintes funcionalidades:
+Para poder utilizar a classe você precisa de uma chave de consumo da API e de uma chave secreta, você pode encontrar o passo a passo para obter essas informações [aqui](https://bitize.stoplight.io/docs/api/docs/autenticacao/Como-obter-o-token-de-acesso.md)
+
+O objetivo da classe (bitize.prw) é centralizar a comunicação com a API do Bitize e possui as seguintes funcionalidades:
 
 - [x] Gerenciamento do Token
 - [x] Método POST
@@ -49,7 +51,7 @@ oBitize:= bitize():new()
 
 oJson:= JsonObject():new()
 oJson['external_id']	:= '000001'
-oJson['title']				:= 'Projeto Teste'
+oJson['title']		:= 'Projeto Teste'
 oJson['description']	:= 'Descrição do Projeto Teste'
 
 //Faz o POST do cadastro do projeto
@@ -66,7 +68,7 @@ if lRet
         conout('listou!')
 
 	oJson:= JsonObject():new()
-	oJson['title']				:= 'Projeto Teste 2'
+	oJson['title']		:= 'Projeto Teste 2'
 	oJson['description']	:= 'Descrição do Projeto Teste 2'
 
 	//Faz o PUT do cadastro do projeto
@@ -93,14 +95,22 @@ return
 
 ```
 
-### Exemplos
-- [ ] Cadastro de Usuários
-- [ ] Cadastro de Compradores
-- [ ] Cadastro de Centros de Custos
-- [ ] Cadastro de Grupos de Produtos
-- [ ] Cadastro de Produtos
-- [ ] Cadastro de Fornecedores
+## 📝 Parâmetros
 
+Os parâmetros BT_CONKEY e BT_SECKEY devem ser preenchidos com o chave de consumo e a chave secreta respectivamente para o funcionamento da classe
+
+| Parâmetro | Descrição                                 | Tipo    | Default                   |
+|:---------:|-------------------------------------------|---------|---------------------------|
+| BT_HOST   | URL do Host                               | String  | https://api.bitize.com.br |
+| BT_CONKEY | Consumer Key                              |  String |                           |
+| BT_SECKEY | Secret Key                                |  String |                           |
+| BT_ATOKEN | Token de Acesso                           |  String |                           |
+| BT_RTOKEN | Refresh Token                             | String  |                           |
+| BT_DTATOK | Data de Validade do Token                 | Date    |                           |
+| BT_HRATOK | Hora de Validade do Token                 | String  |                           |
+| BT_DTRTOK | Data de Validade do Token                 | Date    |                           |
+| BT_HRRTOK | Hora de Validade do Token                 | String  |                           |
+| BT_VERBO  | Indica a utilização de mensagens de debug | Logical | .T.                       |
 
 ## 📝 Licença
 
