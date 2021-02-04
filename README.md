@@ -32,27 +32,64 @@ Esse projeto tem como objetivo integrar uma base do Totvs Microsiga Protheus pad
 - [x] Método GetError
 
 ```clipper
-function Teste()
-local oBitize:= bitize():new() //Instância a classe
+function tstBtz()
+local oBitize:= nil
+local oJson  := nil
 local lRet   := .t.
-local oJson  := JsonObject():new()
 
-oJson['title']:= 'Produto Teste'
-oJson['description']:= 'Descrição do Produto Teste'
-
-lRet:= oBitize:post()
-
-//Faz o POST em https://api.bitize.com.br/consumer-products
-lRet:= oBitize.post('consumer-products',oJson)
-
-//Faz um GET em https://api.bitize.com.br/consumer-products
-lRet:= oBitize.get('consumer-products')
-
-if lRet
-   conout('Sucesso!')
+RpcSetType(3)
+if !RpcSetEnv('99','01')
+	return
 endif
 
+//Instancia a classe
+oBitize:= bitize():new()
+
+oJson:= JsonObject():new()
+oJson['external_id']	:= '000001'
+oJson['title']				:= 'Projeto Teste'
+oJson['description']	:= 'Descrição do Projeto Teste'
+
+//Faz o POST do cadastro do projeto
+lRet:= oBitize:post('projects',oJson)
+
+if lRet
+	conout('cadastrou!')
+	oRet:= oBitize:getResponse()
+
+	//Faz o GET do cadastro do projeto
+	lRet:= oBitize:get('projects/' + oRet['id'])
+
+	if lRet
+		conout('listou!')
+
+		oJson:= JsonObject():new()
+		oJson['title']				:= 'Projeto Teste 2'
+		oJson['description']	:= 'Descrição do Projeto Teste 2'
+
+		//Faz o PUT do cadastro do projeto
+		lRet:= oBitize:put('projects/' + oRet['id'],oJson)
+
+		if lRet
+			conout('atualizou')
+
+			//Faz o DELETE do cadastro do projeto
+			lRet:= oBitize:delete('projects/' + oRet['id'])
+
+			if lRet
+				conout('deletou')
+			endif
+		endif
+	endif
+endif
+
+if !lRet
+	conout(oBitize:getError())
+endif
+
+RPCClearEnv()
 return
+
 ```
 
 ### Exemplos
