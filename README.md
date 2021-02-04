@@ -16,7 +16,7 @@
 </p>
 
 
-## 💻 Integração Protheus x Bitize
+## 🚧 Integração Protheus x Bitize 🚧 Em Construção
 
 Esse projeto tem como objetivo integrar uma base do Totvs Microsiga Protheus padrão com a Plataforma de Gestão de Compras 
 
