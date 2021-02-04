@@ -95,14 +95,6 @@ return
 
 ```
 
-### Exemplos
-- [ ] Cadastro de Usuários
-- [ ] Cadastro de Compradores
-- [ ] Cadastro de Centros de Custos
-- [ ] Cadastro de Grupos de Produtos
-- [ ] Cadastro de Produtos
-- [ ] Cadastro de Fornecedores
-
 
 ## 📝 Licença
 
