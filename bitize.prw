@@ -24,15 +24,14 @@ class bitize
 	data oRet       as Object
 	data cErro      as String
 	data aHeaders   as Array
-	data oRest      as Object
 
 	method new() CONSTRUCTOR
 	method consoleLog(cMsg,lErro)
 	method refresh()
-	method post(cPath,oJson,cParams,aHeader)
-	method get(cPath,cParams,aHeader)
-	method put(oJson,cPath,cParams,aHeader)
-	method delete(cPath,cParams,aHeader)
+	method post(cPath,oJson,cQuery,aHeader)
+	method get(cPath,cQuery,aHeader)
+	method put(oJson,cPath,cQuery,aHeader)
+	method delete(cPath,cQuery,aHeader)
 	method getResponse()
 	method getError()
 
@@ -49,7 +48,6 @@ Instância a classe
 method new() class bitize
 
 	::cHost     := superGetMV('BT_HOST'   ,.f.,'http://localhost:3333')
-	::oRest			:= FWRest():New(::cHost)
 	::cConsumer := superGetMV('BT_USER'   ,.f.,'268f364d-0eff-4cb5-a9cd-0ebc3dca0c27')
 	::cSecret   := superGetMV('BT_PSW'    ,.f.,'17a44e1add0941066c5!@e1asdf35223@%#$9ab3cd193f41d71@!@@f')
 	::cAToken   := superGetMV('BT_TOKEN'  ,.f.,'')
@@ -198,19 +196,20 @@ Método HTTP Post
 @since 03/02/2021
 @param cPath, character, Path
 @param oJson, object, JSON a ser enviado
-@param cParams, character, Query strings
+@param cQuery, character, Query strings
 @param aHeader, array, Headers
 @param lRefresh, logical, Indica se deve verificar o token
 @return logical, Retorna true se integração ocorreu com sucesso
 /*/
-method post(cPath,oJson,cParams,aHeader,lRefresh) class bitize
+method post(cPath,oJson,cQuery,aHeader,lRefresh) class bitize
+	local oRest:= FWRest():New(::cHost)
 	local cLog := ''
 	local cPost:= ''
 	local aHd  := {}
 	local nx   := 0
 
-	default cParams	:= ''
-	default cParams	:= ''
+	default cQuery	:= ''
+	default cQuery	:= ''
 	default aHeader	:= {}
 	default lRefresh:= .t.
 
@@ -229,7 +228,7 @@ method post(cPath,oJson,cParams,aHeader,lRefresh) class bitize
 		cPath:= '/' + cPath
 	endif
 
-	::oRest:setPath(cPath)
+	oRest:setPath(cPath)
 
 	cPost:= encodeUTF8(strtran(FWJsonSerialize(oJson, .F., .F., .T.),'\'))
 	if empty(cPost)
@@ -241,14 +240,14 @@ method post(cPath,oJson,cParams,aHeader,lRefresh) class bitize
 		aAdd(aHd,aHeader[nX])
 	next
 
-	::oRest:SetPostParams(cPost)
+	oRest:SetPostParams(cPost)
 
-	if ::oRest:Post(aHd)
-		if !empty(::oRest:GetResult())
-			::cRet:= FWNoAccent(DecodeUtf8(::oRest:GetResult()))
+	if oRest:Post(aHd)
+		if !empty(oRest:GetResult())
+			::cRet:= FWNoAccent(DecodeUtf8(oRest:GetResult()))
 
 			if empty(::cRet)
-				::cRet:= FWNoAccent(::oRest:GetResult())
+				::cRet:= FWNoAccent(oRest:GetResult())
 			endif
 
 			::oRet:= JsonObject():new()
@@ -265,16 +264,16 @@ method post(cPath,oJson,cParams,aHeader,lRefresh) class bitize
 	else
 		::oRet := nil
 
-		::cRet:= FWNoAccent(DecodeUtf8(::oRest:GetResult()))
+		::cRet:= FWNoAccent(DecodeUtf8(oRest:GetResult()))
 
 		if empty(::cRet)
-			::cRet:= FWNoAccent(::oRest:GetResult())
+			::cRet:= FWNoAccent(oRest:GetResult())
 		endif
 
-		cAux:= FWNoAccent(DecodeUtf8(::oRest:GetLastError()))
+		cAux:= FWNoAccent(DecodeUtf8(oRest:GetLastError()))
 
 		if empty(cAux)
-			cAux:= FWNoAccent(::oRest:GetLastError())
+			cAux:= FWNoAccent(oRest:GetLastError())
 		endif
 
 		cLog+= 'Host: ' + ::cHost + CRLF
@@ -294,19 +293,20 @@ Método HTTP GET
 @author Carlos Tirabassi
 @since 03/02/2021
 @param cPath, character, Path
-@param cParams, character, Query string
+@param cQuery, character, Query string
 @param aHeader, array, Headers
 @param lRefresh, logical, Indica se deve verificar o token
 @return logical, Retorna true se integração ocorreu com sucesso
 /*/
-method get(cPath,cParams,aHeader,lRefresh) class bitize
+method get(cPath,cQuery,aHeader,lRefresh) class bitize
+	local oRest := FWRest():New(::cHost)
 	local cLog	:= ''
 	local aHd  	:= {}
 	local nx   	:= 0
 	local cAux  := ''
 
 	default cPath  := ''
-	default cParams:= ''
+	default cQuery:= ''
 	default aHeader:= {}
 	default lRefresh:= .t.
 
@@ -323,19 +323,19 @@ method get(cPath,cParams,aHeader,lRefresh) class bitize
 		cPath:= '/' + cPath
 	endif
 
-	::oRest:setPath(cPath + if(!empty(cParams),'?'+cParams,''))
+	oRest:setPath(cPath + if(!empty(cQuery),'?'+cQuery,''))
 
 	aHd:= ::aHeaders
 	for nX:=1 to len(aHeader)
 		aAdd(aHd,aHeader[nX])
 	next
 
-	if ::oRest:Get({aHd})
-		if !empty(::oRest:GetResult())
-			::cRet:= FWNoAccent(DecodeUtf8(::oRest:GetResult()))
+	if oRest:Get(aHd)
+		if !empty(oRest:GetResult())
+			::cRet:= FWNoAccent(DecodeUtf8(oRest:GetResult()))
 
 			if empty(::cRet)
-				::cRet:= FWNoAccent(::oRest:GetResult())
+				::cRet:= FWNoAccent(oRest:GetResult())
 			endif
 
 			::cRet:= strTran(::cRet,'\/','/')
@@ -352,23 +352,28 @@ method get(cPath,cParams,aHeader,lRefresh) class bitize
 			::cErro:= ''
 			::lRet := .t.
 		endif
+		::consoleLog('Sucesso! Operacao: GET ' + cPath)
 	else
 		::oRet := nil
 
-		::cRet:= FWNoAccent(DecodeUtf8(::oRest:GetResult()))
+		if !empty(oRest:GetResult())
+			::cRet:= FWNoAccent(DecodeUtf8(oRest:GetResult()))
 
-		if empty(::cRet)
-			::cRet:= FWNoAccent(::oRest:GetResult())
+			if empty(::cRet)
+				::cRet:= FWNoAccent(oRest:GetResult())
+			endif
 		endif
 
-		cAux:= FWNoAccent(DecodeUtf8(::oRest:GetLastError()))
+		if !empty(oRest:GetLastError())
+			cAux:= FWNoAccent(DecodeUtf8(oRest:GetLastError()))
 
-		if empty(cAux)
-			cAux:= FWNoAccent(::oRest:GetLastError())
+			if empty(cAux)
+				cAux:= FWNoAccent(oRest:GetLastError())
+			endif
 		endif
 
 		cLog+= 'Host: ' + ::cHost + CRLF
-		cLog+= 'Operacao: GET ' + cPath + CRLF
+		cLog+= 'Operacao: PUT ' + cPath + CRLF
 		cLog+= 'Erro: ' + cAux + CRLF
 		cLog+= 'Resultado: ' + ::cRet + CRLF
 
@@ -385,18 +390,19 @@ Método HTTP PUT
 @since 03/02/2021
 @param cPath, character, Path
 @param oJson, object, JSON que será enviado
-@param cParams, character, Query string
+@param cQuery, character, Query string
 @param aHeader, array, Headers
 @return logical, Retorna true se integração ocorreu com sucesso
 /*/
-method put(cPath,oJson,cParams,aHeader) class bitize
+method put(cPath,oJson,cQuery,aHeader) class bitize
+	local oRest:= FWRest():New(::cHost)
 	local cLog := ''
 	local cPut := ''
 	local aHd  := {}
 	local cAux := ''
 	local nx   := 0
 
-	default cParams := ''
+	default cQuery := ''
 	default aHeader	:= {}
 
 	::refresh()
@@ -412,7 +418,7 @@ method put(cPath,oJson,cParams,aHeader) class bitize
 		cPath:= '/' + cPath
 	endif
 
-	::oRest:setPath(cPath + if(!empty(cParams),'?'+cParams,''))
+	oRest:setPath(cPath + if(!empty(cQuery),'?'+cQuery,''))
 
 	cPut:= encodeUTF8(strtran(FWJsonSerialize(oJson, .F., .F., .T.),'\'))
 	if empty(cPut)
@@ -424,9 +430,9 @@ method put(cPath,oJson,cParams,aHeader) class bitize
 		aAdd(aHd,aHeader[nX])
 	next
 
-	if ::oRest:Put(aHd,cPut)
-		if !empty(::oRest:GetResult())
-			::cRet:= ::oRest:GetResult()
+	if oRest:Put(aHd,cPut)
+		if !empty(oRest:GetResult())
+			::cRet:= oRest:GetResult()
 
 			::oRet:= JsonObject():new()
 			::oRet:fromJson(::cRet)
@@ -438,19 +444,20 @@ method put(cPath,oJson,cParams,aHeader) class bitize
 			::cErro:= ''
 			::lRet := .t.
 		endif
+		::consoleLog('Sucesso! Operacao: PUT ' + cPath)
 	else
 		::oRet := nil
 
-		::cRet:= FWNoAccent(DecodeUtf8(::oRest:GetResult()))
+		::cRet:= FWNoAccent(DecodeUtf8(oRest:GetResult()))
 
 		if empty(::cRet)
-			::cRet:= FWNoAccent(::oRest:GetResult())
+			::cRet:= FWNoAccent(oRest:GetResult())
 		endif
 
-		cAux:= FWNoAccent(DecodeUtf8(::oRest:GetLastError()))
+		cAux:= FWNoAccent(DecodeUtf8(oRest:GetLastError()))
 
 		if empty(cAux)
-			cAux:= FWNoAccent(::oRest:GetLastError())
+			cAux:= FWNoAccent(oRest:GetLastError())
 		endif
 
 		cLog+= 'Host: ' + ::cHost + CRLF
@@ -470,17 +477,18 @@ Método DELETE
 @author Carlos Tirabassi
 @since 03/02/2021
 @param cPath, character, Path
-@param cParams, character, Query string
+@param cQuery, character, Query string
 @param aHeader, array, Headers
 @return logical, Se a integração ocorrer com sucesso retorna true
 /*/
-method delete(cPath,cParams,aHeader) class bitize
+method delete(cPath,cQuery,aHeader) class bitize
+	local oRest:= FWRest():New(::cHost)
 	local cLog:= ''
 	local aHd  := {}
 	local cAux := ''
 	local nx   := 0
 
-	default cParams := ''
+	default cQuery := ''
 	default aHeader	:= {}
 
 	::refresh()
@@ -494,19 +502,19 @@ method delete(cPath,cParams,aHeader) class bitize
 		cPath:= '/' + cPath
 	endif
 
-	::oRest:setPath(cPath + if(!empty(cParams),'?'+cParams,''))
+	oRest:setPath(cPath + if(!empty(cQuery),'?'+cQuery,''))
 
 	aHd:= ::aHeaders
 	for nX:=1 to len(aHeader)
 		aAdd(aHd,aHeader[nX])
 	next
 
-	if ::oRest:Delete(aHd)
-		if !empty(::oRest:GetResult())
-			::cRet:= FWNoAccent(DecodeUtf8(::oRest:GetResult()))
+	if oRest:Delete(aHd)
+		if !empty(oRest:GetResult())
+			::cRet:= FWNoAccent(DecodeUtf8(oRest:GetResult()))
 
 			if empty(::cRet)
-				::cRet:= FWNoAccent(::oRest:GetResult())
+				::cRet:= FWNoAccent(oRest:GetResult())
 			endif
 
 			::oRet:= JsonObject():new()
@@ -520,23 +528,24 @@ method delete(cPath,cParams,aHeader) class bitize
 			::cErro:= ''
 			::lRet := .t.
 		endif
+		::consoleLog('Sucesso! Operacao: DELETE ' + cPath)
 	else
 		::oRet := nil
 
-		::cRet:= FWNoAccent(DecodeUtf8(::oRest:GetResult()))
+		::cRet:= FWNoAccent(DecodeUtf8(oRest:GetResult()))
 
 		if empty(::cRet)
-			::cRet:= FWNoAccent(::oRest:GetResult())
+			::cRet:= FWNoAccent(oRest:GetResult())
 		endif
 
-		cAux:= FWNoAccent(DecodeUtf8(::oRest:GetLastError()))
+		cAux:= FWNoAccent(DecodeUtf8(oRest:GetLastError()))
 
 		if empty(cAux)
-			cAux:= FWNoAccent(::oRest:GetLastError())
+			cAux:= FWNoAccent(oRest:GetLastError())
 		endif
 
 		cLog+= 'Host: ' + ::cHost + CRLF
-		cLog+= 'Operacao: GET ' + cPath + CRLF
+		cLog+= 'Operacao: DELETE ' + cPath + CRLF
 		cLog+= 'Erro: ' + cAux + CRLF
 		cLog+= 'Resultado: ' + ::cRet + CRLF
 
@@ -648,15 +657,47 @@ user function tstBtz()
 	//Instancia a classe
 	oBitize:= bitize():new()
 
-	SB1->(dbSetOrder(1))
-	SB1->(dbGoTop())
-
 	oJson:= JsonObject():new()
-	oJson['external_id']	:= allTrim(SB1->(B1_FILIAL+B1_COD))
-	oJson['title']				:= allTrim(SB1->B1_DESC)
-	oJson['description']	:= allTrim(SB1->B1_DESC)
+	oJson['external_id']	:= '000001'
+	oJson['title']				:= 'Projeto Teste'
+	oJson['description']	:= 'Descrição do Projeto Teste'
 
-	lRet:= oBitize:post('consumer-products',oJson)
+	//Faz o POST do cadastro do projeto
+	lRet:= oBitize:post('projects',oJson)
+
+	if lRet
+		conout('cadastrou!')
+		oRet:= oBitize:getResponse()
+
+		//Faz o GET do cadastro do projeto
+		lRet:= oBitize:get('projects/' + oRet['id'])
+
+		if lRet
+			conout('listou!')
+
+			oJson:= JsonObject():new()
+			oJson['title']				:= 'Projeto Teste 2'
+			oJson['description']	:= 'Descrição do Projeto Teste 2'
+
+			//Faz o PUT do cadastro do projeto
+			lRet:= oBitize:put('projects/' + oRet['id'],oJson)
+
+			if lRet
+				conout('atualizou')
+
+				//Faz o DELETE do cadastro do projeto
+				lRet:= oBitize:delete('projects/' + oRet['id'])
+
+				if lRet
+					conout('deletou')
+				endif
+			endif
+		endif
+	endif
+
+	if !lRet
+		conout(oBitize:getError())
+	endif
 
 	RPCClearEnv()
 return
