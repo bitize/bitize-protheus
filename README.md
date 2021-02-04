@@ -49,7 +49,7 @@ oBitize:= bitize():new()
 
 oJson:= JsonObject():new()
 oJson['external_id']	:= '000001'
-oJson['title']				:= 'Projeto Teste'
+oJson['title']		:= 'Projeto Teste'
 oJson['description']	:= 'Descrição do Projeto Teste'
 
 //Faz o POST do cadastro do projeto
@@ -66,7 +66,7 @@ if lRet
         conout('listou!')
 
 	oJson:= JsonObject():new()
-	oJson['title']				:= 'Projeto Teste 2'
+	oJson['title']		:= 'Projeto Teste 2'
 	oJson['description']	:= 'Descrição do Projeto Teste 2'
 
 	//Faz o PUT do cadastro do projeto
