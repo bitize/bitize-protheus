@@ -31,6 +31,8 @@ Esse projeto tem como objetivo integrar uma base do Totvs Microsiga Protheus pad
 - [x] Método GetResponse
 - [x] Método GetError
 
+**Exemplo de utilização da classe:**
+
 ```clipper
 function tstBtz()
 local oBitize:= nil
