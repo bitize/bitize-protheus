@@ -95,6 +95,22 @@ return
 
 ```
 
+## 📝 Parâmetros
+
+Os parâmetros BT_CONKEY e BT_SECKEY devem ser preenchidos com o chave de consumo e a chave secreta respectivamente para o funcionamento da classe
+
+| Parâmetro | Descrição                                 | Tipo    | Default                   |
+|:---------:|-------------------------------------------|---------|---------------------------|
+| BT_HOST   | URL do Host                               | String  | https://api.bitize.com.br |
+| BT_CONKEY | Consumer Key                              |  String |                           |
+| BT_SECKEY | Secret Key                                |  String |                           |
+| BT_ATOKEN | Token de Acesso                           |  String |                           |
+| BT_RTOKEN | Refresh Token                             | String  |                           |
+| BT_DTATOK | Data de Validade do Token                 | Date    |                           |
+| BT_HRATOK | Hora de Validade do Token                 | String  |                           |
+| BT_DTRTOK | Data de Validade do Token                 | Date    |                           |
+| BT_HRRTOK | Hora de Validade do Token                 | String  |                           |
+| BT_VERBO  | Indica a utilização de mensagens de debug | Logical | .T.                       |
 
 ## 📝 Licença
 
