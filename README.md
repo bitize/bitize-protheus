@@ -21,7 +21,9 @@
 Esse projeto tem como objetivo integrar uma base do Totvs Microsiga Protheus padrão com a Plataforma de Gestão de Compras [BITIZE](https://www.bitize.com.br)
 
 ### Classe de Integração
-  O objetivo é centralizar a comunicação com a API do Bitize e possui as seguintes funcionalidades:
+Para poder utilizar a classe você precisa de uma chave de consumo da API e de uma chave secreta, você pode encontrar o passo a passo para obter essas informações [aqui](https://bitize.stoplight.io/docs/api/docs/autenticacao/Como-obter-o-token-de-acesso.md)
+
+O objetivo da classe (bitize.prw) é centralizar a comunicação com a API do Bitize e possui as seguintes funcionalidades:
 
 - [x] Gerenciamento do Token
 - [x] Método POST
