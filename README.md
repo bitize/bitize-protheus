@@ -16,7 +16,7 @@
 </p>
 
 
-## 🚧 Integração Protheus x Bitize 🚧 Em Construção
+## 🚧 Integração Protheus x Bitize 🚧  Em Construção
 
 Esse projeto tem como objetivo integrar uma base do Totvs Microsiga Protheus padrão com a Plataforma de Gestão de Compras 
 
@@ -37,7 +37,13 @@ local oBitize:= bitize():new() //Instância a classe
 local lRet   := .t.
 local oJson  := JsonObject():new()
 
+oJson['title']:= 'Produto Teste'
+oJson['description']:= 'Descrição do Produto Teste'
+
 lRet:= oBitize:post()
+
+//Faz o POST em https://api.bitize.com.br/consumer-products
+lRet:= oBitize.post('consumer-products',oJson)
 
 //Faz um GET em https://api.bitize.com.br/consumer-products
 lRet:= oBitize.get('consumer-products')
