@@ -39,7 +39,7 @@ local lRet   := .t.
 
 RpcSetType(3)
 if !RpcSetEnv('99','01')
-	return
+    return
 endif
 
 //Instancia a classe
@@ -54,37 +54,36 @@ oJson['description']	:= 'Descrição do Projeto Teste'
 lRet:= oBitize:post('projects',oJson)
 
 if lRet
-	conout('cadastrou!')
-	oRet:= oBitize:getResponse()
+    conout('cadastrou!')
+    oRet:= oBitize:getResponse()
 
-	//Faz o GET do cadastro do projeto
-	lRet:= oBitize:get('projects/' + oRet['id'])
+    //Faz o GET do cadastro do projeto
+    lRet:= oBitize:get('projects/' + oRet['id'])
 
+    if lRet
+        conout('listou!')
+
+	oJson:= JsonObject():new()
+	oJson['title']				:= 'Projeto Teste 2'
+	oJson['description']	:= 'Descrição do Projeto Teste 2'
+
+	//Faz o PUT do cadastro do projeto
+	lRet:= oBitize:put('projects/' + oRet['id'],oJson)
 	if lRet
-		conout('listou!')
+	    conout('atualizou')
 
-		oJson:= JsonObject():new()
-		oJson['title']				:= 'Projeto Teste 2'
-		oJson['description']	:= 'Descrição do Projeto Teste 2'
+	    //Faz o DELETE do cadastro do projeto
+	    lRet:= oBitize:delete('projects/' + oRet['id'])
 
-		//Faz o PUT do cadastro do projeto
-		lRet:= oBitize:put('projects/' + oRet['id'],oJson)
-
-		if lRet
-			conout('atualizou')
-
-			//Faz o DELETE do cadastro do projeto
-			lRet:= oBitize:delete('projects/' + oRet['id'])
-
-			if lRet
-				conout('deletou')
-			endif
-		endif
+	    if lRet
+		conout('deletou')
+	    endif
 	endif
+    endif
 endif
 
 if !lRet
-	conout(oBitize:getError())
+    conout(oBitize:getError())
 endif
 
 RPCClearEnv()
