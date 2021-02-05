@@ -47,10 +47,10 @@ Instância a classe
 /*/
 method new() class bitize
 
-	::cHost     := superGetMV('BT_HOST'   ,.f.,'http://localhost:3333')
-	::cConsumer := superGetMV('BT_CONKEY' ,.f.,'268f364d-0eff-4cb5-a9cd-0ebc3dca0c27')
-	::cSecret   := superGetMV('BT_SECKEY' ,.f.,'17a44e1add0941066c5!@e1asdf35223@%#$9ab3cd193f41d71@!@@f')
-	::cAToken   := superGetMV('BT_ATOKEN'  ,.f.,'')
+	::cHost     := superGetMV('BT_HOST'   ,.f.,'')
+	::cConsumer := superGetMV('BT_CONKEY' ,.f.,'')
+	::cSecret   := superGetMV('BT_SECKEY' ,.f.,'')
+	::cAToken   := superGetMV('BT_ATOKEN' ,.f.,'')
 	::cRToken   := superGetMV('BT_RTOKEN' ,.f.,'')
 	::lVerb		  := superGetMV('BT_VERBO'  ,.f.,.T.)
 	::dDtAToken	:= superGetMV('BT_DTATOK' ,.f.,ctod('  /  /    '))
