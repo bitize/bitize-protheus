@@ -20,7 +20,8 @@ class bitize
 	data dDtRToken	as Date
 	data cHrRToken 	as String
 	data lRet       as Logical
-	data cRet       as String
+	data cRequest   as String
+	data cResponse  as String
 	data oRet       as Object
 	data cErro      as String
 	data aHeaders   as Array
@@ -58,7 +59,8 @@ method new() class bitize
 	::dDtRToken	:= superGetMV('BT_DTRTOK' ,.f.,ctod('  /  /    '))
 	::cHrRToken := superGetMV('BT_HRRTOK' ,.f.,'')
 	::lRet      := .t.
-	::cRet      := ''
+	::cRequest  := ''
+	::cResponse := ''
 	::oRet      := nil
 	::cErro     := ''
 	::aHeaders	:= {"Content-Type: application/json"}
@@ -217,10 +219,11 @@ method post(cPath,oJson,cQuery,aHeader,lRefresh) class bitize
 		::refresh()
 	endif
 
-	::cRet := ''
-	::oRet := nil
-	::lRet := .t.
-	::cErro:= ''
+  ::cRequest  := ''
+	::cResponse := ''
+	::oRet      := nil
+	::lRet      := .t.
+	::cErro     := ''
 
 	cPath:= allTrim(cPath)
 
@@ -235,23 +238,24 @@ method post(cPath,oJson,cQuery,aHeader,lRefresh) class bitize
 		cPost:= strtran(FWJsonSerialize(oJson, .F., .F., .T.),'\')
 	endif
 
+	::cRequest:= cPost
+	oRest:SetPostParams(::cRequest)
+
 	aHd:= ::aHeaders
 	for nX:=1 to len(aHeader)
 		aAdd(aHd,aHeader[nX])
 	next
 
-	oRest:SetPostParams(cPost)
-
 	if oRest:Post(aHd)
 		if !empty(oRest:GetResult())
-			::cRet:= FWNoAccent(DecodeUtf8(oRest:GetResult()))
+			::cResponse:= FWNoAccent(DecodeUtf8(oRest:GetResult()))
 
-			if empty(::cRet)
-				::cRet:= FWNoAccent(oRest:GetResult())
+			if empty(::cResponse)
+				::cResponse:= FWNoAccent(oRest:GetResult())
 			endif
 
 			::oRet:= JsonObject():new()
-			::oRet:fromJson(::cRet)
+			::oRet:fromJson(::cResponse)
 
 			::lRet := .t.
 			::cErro:= ''
@@ -264,10 +268,10 @@ method post(cPath,oJson,cQuery,aHeader,lRefresh) class bitize
 	else
 		::oRet := nil
 
-		::cRet:= FWNoAccent(DecodeUtf8(oRest:GetResult()))
+		::cResponse:= FWNoAccent(DecodeUtf8(oRest:GetResult()))
 
-		if empty(::cRet)
-			::cRet:= FWNoAccent(oRest:GetResult())
+		if empty(::cResponse)
+			::cResponse:= FWNoAccent(oRest:GetResult())
 		endif
 
 		cAux:= FWNoAccent(DecodeUtf8(oRest:GetLastError()))
@@ -279,7 +283,7 @@ method post(cPath,oJson,cQuery,aHeader,lRefresh) class bitize
 		cLog+= 'Host: ' + ::cHost + CRLF
 		cLog+= 'Operacao: POST ' + cPath + CRLF
 		cLog+= 'Erro: ' + cAux + CRLF
-		cLog+= 'Resultado: ' + ::cRet + CRLF
+		cLog+= 'Resultado: ' + ::cResponse + CRLF
 
 		::consoleLog(cLog,.T.)
 	endif
@@ -314,7 +318,7 @@ method get(cPath,cQuery,aHeader,lRefresh) class bitize
 		::refresh()
 	endif
 
-	::cRet := ''
+	::cResponse := ''
 	::oRet := nil
 	::lRet := .t.
 	::cErro:= ''
@@ -332,18 +336,18 @@ method get(cPath,cQuery,aHeader,lRefresh) class bitize
 
 	if oRest:Get(aHd)
 		if !empty(oRest:GetResult())
-			::cRet:= FWNoAccent(DecodeUtf8(oRest:GetResult()))
+			::cResponse:= FWNoAccent(DecodeUtf8(oRest:GetResult()))
 
-			if empty(::cRet)
-				::cRet:= FWNoAccent(oRest:GetResult())
+			if empty(::cResponse)
+				::cResponse:= FWNoAccent(oRest:GetResult())
 			endif
 
-			::cRet:= strTran(::cRet,'\/','/')
-			::cRet:= strtran(::cRet,":null",': " "')
-			::cRet:= strtran(::cRet,'"self"','"_self"')
+			::cResponse:= strTran(::cResponse,'\/','/')
+			::cResponse:= strtran(::cResponse,":null",': " "')
+			::cResponse:= strtran(::cResponse,'"self"','"_self"')
 
 			::oRet:= JsonObject():new()
-			::oRet:fromJson(::cRet)
+			::oRet:fromJson(::cResponse)
 
 			::lRet := .t.
 			::cErro:= ''
@@ -357,10 +361,10 @@ method get(cPath,cQuery,aHeader,lRefresh) class bitize
 		::oRet := nil
 
 		if !empty(oRest:GetResult())
-			::cRet:= FWNoAccent(DecodeUtf8(oRest:GetResult()))
+			::cResponse:= FWNoAccent(DecodeUtf8(oRest:GetResult()))
 
-			if empty(::cRet)
-				::cRet:= FWNoAccent(oRest:GetResult())
+			if empty(::cResponse)
+				::cResponse:= FWNoAccent(oRest:GetResult())
 			endif
 		endif
 
@@ -375,7 +379,7 @@ method get(cPath,cQuery,aHeader,lRefresh) class bitize
 		cLog+= 'Host: ' + ::cHost + CRLF
 		cLog+= 'Operacao: PUT ' + cPath + CRLF
 		cLog+= 'Erro: ' + cAux + CRLF
-		cLog+= 'Resultado: ' + ::cRet + CRLF
+		cLog+= 'Resultado: ' + ::cResponse + CRLF
 
 		::consoleLog(cLog,.T.)
 	endif
@@ -407,10 +411,11 @@ method put(cPath,oJson,cQuery,aHeader) class bitize
 
 	::refresh()
 
-	::cRet := ''
-	::oRet := nil
-	::lRet := .t.
-	::cErro:= ''
+  ::cRequest  := ''
+	::cResponse := ''
+	::oRet      := nil
+	::lRet      := .t.
+	::cErro     := ''
 
 	cPath:= allTrim(cPath)
 
@@ -425,17 +430,19 @@ method put(cPath,oJson,cQuery,aHeader) class bitize
 		cPut:= strtran(FWJsonSerialize(oJson, .F., .F., .T.),'\')
 	endif
 
+	::cRequest:= cPut
+
 	aHd:= ::aHeaders
 	for nX:=1 to len(aHeader)
 		aAdd(aHd,aHeader[nX])
 	next
 
-	if oRest:Put(aHd,cPut)
+	if oRest:Put(aHd,::cRequest)
 		if !empty(oRest:GetResult())
-			::cRet:= oRest:GetResult()
+			::cResponse:= oRest:GetResult()
 
 			::oRet:= JsonObject():new()
-			::oRet:fromJson(::cRet)
+			::oRet:fromJson(::cResponse)
 
 			::lRet := .t.
 			::cErro:= ''
@@ -448,10 +455,10 @@ method put(cPath,oJson,cQuery,aHeader) class bitize
 	else
 		::oRet := nil
 
-		::cRet:= FWNoAccent(DecodeUtf8(oRest:GetResult()))
+		::cResponse:= FWNoAccent(DecodeUtf8(oRest:GetResult()))
 
-		if empty(::cRet)
-			::cRet:= FWNoAccent(oRest:GetResult())
+		if empty(::cResponse)
+			::cResponse:= FWNoAccent(oRest:GetResult())
 		endif
 
 		cAux:= FWNoAccent(DecodeUtf8(oRest:GetLastError()))
@@ -463,7 +470,7 @@ method put(cPath,oJson,cQuery,aHeader) class bitize
 		cLog+= 'Host: ' + ::cHost + CRLF
 		cLog+= 'Operacao: GET ' + cPath + CRLF
 		cLog+= 'Erro: ' + cAux + CRLF
-		cLog+= 'Resultado: ' + ::cRet + CRLF
+		cLog+= 'Resultado: ' + ::cResponse + CRLF
 
 		::consoleLog(cLog,.T.)
 	endif
@@ -493,7 +500,7 @@ method delete(cPath,cQuery,aHeader) class bitize
 
 	::refresh()
 
-	::cRet := ''
+	::cResponse := ''
 	::oRet := nil
 	::lRet := .t.
 	::cErro:= ''
@@ -511,14 +518,14 @@ method delete(cPath,cQuery,aHeader) class bitize
 
 	if oRest:Delete(aHd)
 		if !empty(oRest:GetResult())
-			::cRet:= FWNoAccent(DecodeUtf8(oRest:GetResult()))
+			::cResponse:= FWNoAccent(DecodeUtf8(oRest:GetResult()))
 
-			if empty(::cRet)
-				::cRet:= FWNoAccent(oRest:GetResult())
+			if empty(::cResponse)
+				::cResponse:= FWNoAccent(oRest:GetResult())
 			endif
 
 			::oRet:= JsonObject():new()
-			::oRet:fromJson(::cRet)
+			::oRet:fromJson(::cResponse)
 
 			::lRet := .t.
 			::cErro:= ''
@@ -532,10 +539,10 @@ method delete(cPath,cQuery,aHeader) class bitize
 	else
 		::oRet := nil
 
-		::cRet:= FWNoAccent(DecodeUtf8(oRest:GetResult()))
+		::cResponse:= FWNoAccent(DecodeUtf8(oRest:GetResult()))
 
-		if empty(::cRet)
-			::cRet:= FWNoAccent(oRest:GetResult())
+		if empty(::cResponse)
+			::cResponse:= FWNoAccent(oRest:GetResult())
 		endif
 
 		cAux:= FWNoAccent(DecodeUtf8(oRest:GetLastError()))
@@ -547,7 +554,7 @@ method delete(cPath,cQuery,aHeader) class bitize
 		cLog+= 'Host: ' + ::cHost + CRLF
 		cLog+= 'Operacao: DELETE ' + cPath + CRLF
 		cLog+= 'Erro: ' + cAux + CRLF
-		cLog+= 'Resultado: ' + ::cRet + CRLF
+		cLog+= 'Resultado: ' + ::cResponse + CRLF
 
 		::consoleLog(cLog,.T.)
 	endif
