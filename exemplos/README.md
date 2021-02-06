@@ -1,19 +1,11 @@
-<p align="center">
-  <a href="https://www.bitize.com.br">
-    <img src="https://www.bitize.com.br/img/bitize-logo-min.png" width="300" alt="Logo Bitize" />
-  </a>
-</p>
 
-<p align="center">
-<a href="https://github.com/bitize/bitize-protheus/commits/master">
-    <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/bitize/bitize-protheus?color=blue">
-  </a>
+## 🚧 Integração Bitize x Bitize: Exemplos 🚧  Em Construção
 
-  <img alt="License" src="https://img.shields.io/badge/license-MIT-blue">
-   <a href="https://github.com/bitize/bitize-protheus/stargazers">
-    <img alt="Stargazers" src="https://img.shields.io/github/stars/bitize/bitize-protheus?style=social">
-  </a>
-</p>
+Esses fontes tem o objetivo de auxiliar na integração entre a plataforma Bitize e o ERP Protheus da Totvs. São exemplos e você pode utilizar e fazer as alterações necessárias para o seu projeto!
 
-
-## 🚧 Integração Protheus x Bitize 🚧  Em Construção
+| Parâmetro   | Descrição                                 | 
+|:-----------:|-------------------------------------------|
+| bitC001.prw | Cadastro de Usuários                      |
+| bitbw01.prw | Monitor de Integração                     |
+| bitbw02.prw | Tela de Cadastro de Usuários              |
+| bitjob.prw  | Exemplo de Job                            |
