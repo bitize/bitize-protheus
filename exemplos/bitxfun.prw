@@ -79,3 +79,37 @@ User Function bitLog(cErro,lConout)
 	endif
 
 Return cLog
+
+/*/{Protheus.doc} lockRot
+Rotina para executar LockByName
+@type function
+@version 1.0  
+@author Carlos Tirabassi
+@since 21/01/2021
+@param cChave, character, Utilizado como chave do LockByName
+@param nVezes, numeric, Numero de tentativas que serão feitas
+@return logical, retorna true caso obtenha sucesso 
+/*/
+user function lockRot(cChave,nVezes)
+	local lRet:= .f.
+	local nX  := 1
+
+	default cRotina:= ''
+	default nVezes := 3
+
+	for nX:=1 to nVezes
+		if LockByName(cChave)
+			lRet:= .t.
+			EXIT
+		else
+			sleep(randomize( 100,1000))
+		endif
+	next
+
+	if lRet
+		u_bitLog('Semaforo fechado com sucesso: ' + cChave)
+	else
+		u_bitLog('Semaforo já está fechado: ' + cChave)
+	endif
+
+return lRet
