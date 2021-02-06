@@ -43,7 +43,8 @@ Static Function MenuDef()
 	ADD OPTION aRotina TITLE 'Incluir'    ACTION 'VIEWDEF.bitbw02' OPERATION MODEL_OPERATION_INSERT ACCESS 0 //OPERATION 3
 	ADD OPTION aRotina TITLE 'Alterar'    ACTION 'VIEWDEF.bitbw02' OPERATION MODEL_OPERATION_UPDATE ACCESS 0 //OPERATION 4
 	ADD OPTION aRotina TITLE 'Excluir'    ACTION 'VIEWDEF.bitbw02' OPERATION MODEL_OPERATION_DELETE ACCESS 0 //OPERATION 5
-	ADD OPTION aRotina TITLE 'Legenda'    ACTION 'u_LBRWZB1'        OPERATION 6 ACCESS 0 //OPERATION X
+	ADD OPTION aRotina TITLE 'Enviar'     ACTION 'u_procZB1'       OPERATION MODEL_OPERATION_UPDATE ACCESS 0 //OPERATION 4
+	ADD OPTION aRotina TITLE 'Legenda'    ACTION 'u_LBRWZB1'       OPERATION 6 ACCESS 0 //OPERATION X
 
 Return aRotina
 
@@ -126,3 +127,7 @@ static function COMPPOS( oModel )
 	endif
 
 Return lRet
+
+user function procZB1()
+	msgRun('Integrando...','Integração Bitize',{||u_bitUsua()})
+return

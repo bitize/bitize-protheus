@@ -27,6 +27,9 @@ user function bitjob(aEmp,lJob)
 		return
 	endif
 
+	//Usuários
+	jobUsers()
+
 	u_bitLog('rodou')
 
 	unLockByName(cChave)
@@ -34,5 +37,29 @@ user function bitjob(aEmp,lJob)
 	if lJob
 		rpcClearEnv()
 	endif
+
+return
+
+
+/*/{Protheus.doc} jobUsers
+Cadastro de Usuários
+@type function
+@version 1.0 
+@author Carlos Tirabassi
+@since 06/02/2021
+/*/
+static function jobUsers()
+
+	ZB1->(dbSetOrder(1))
+	while ZB1->(!eof())
+
+		if ZB1->ZB1_SIT <> '2'
+			u_bitUsua()
+		endif
+
+		ZB1->(dbSkip())
+	enddo
+
+	ZB1->(dbCloseArea())
 
 return
