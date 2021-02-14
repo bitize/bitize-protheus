@@ -8,7 +8,7 @@ user function bitjob(aEmp,lJob)
 
 	if lJob
 		RpcSetType(3)
-		if !RpcSetEnv(aEmp[1],aEmp[2],,,,,{'ZB0','ZB1'})
+		if !RpcSetEnv(aEmp[1],aEmp[2],,,,,{'ZB0','ZB1','DHL'})
 			u_bitLog("Nao foi possivel abrir as tabelas da Empresa "+aEmp[1]+"/"+aEmp[2])
 			Return
 		endif
@@ -30,6 +30,9 @@ user function bitjob(aEmp,lJob)
 	//Usuários
 	jobUsers()
 
+	//Perfis de Aprovação
+	jobPerf()
+
 	u_bitLog('rodou')
 
 	unLockByName(cChave)
@@ -40,7 +43,6 @@ user function bitjob(aEmp,lJob)
 
 return
 
-
 /*/{Protheus.doc} jobUsers
 Cadastro de Usuários
 @type function
@@ -49,12 +51,18 @@ Cadastro de Usuários
 @since 06/02/2021
 /*/
 static function jobUsers()
+	private oBitize:= bitize():new()
+
+	if !oBitize:lRet
+		u_bitLog('Erro ao carregar a classe do Bitize')
+		return
+	endif
 
 	ZB1->(dbSetOrder(1))
 	while ZB1->(!eof())
 
 		if ZB1->ZB1_SIT <> '2'
-			u_bitUsua()
+			u_bitC001()
 		endif
 
 		ZB1->(dbSkip())
@@ -62,4 +70,30 @@ static function jobUsers()
 
 	ZB1->(dbCloseArea())
 
+return
+
+/*/{Protheus.doc} jobPerf
+Cadastro de Perfil de Aprovação
+@type function
+@version 1.0 
+@author Carlos Tirabassi
+@since 14/02/2021
+/*/
+static function jobPerf()
+	private oBitize:= bitize():new()
+
+	if !oBitize:lRet
+		u_bitLog('Erro ao carregar a classe do Bitize')
+		return
+	endif
+
+	DHL->(dbSetOrder(1))
+	while DHL->(!eof())
+
+		if DHL->DHL_XBTSIT <> '2'
+			u_bitC002()
+		endif
+
+		DHL->(dbSkip())
+	enddo
 return

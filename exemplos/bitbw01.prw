@@ -24,9 +24,8 @@ User Function bitbw01()
 	oBrowse:SetDescription('Monitor de Integraçãos ZB0')
 
   //Legendas
-	oBrowse:AddLegend( "ZB0->ZB0_STATUS == '1'" , "BLUE"	, "Aguardando Processamento")
-	oBrowse:AddLegend( "ZB0->ZB0_STATUS == '2'"	, "GREEN" , "Registro Processado")
-	oBrowse:AddLegend( "ZB0->ZB0_STATUS == '3'"	, "RED"   , "Erro no Processamento")
+	oBrowse:AddLegend( "ZB0->ZB0_STATUS == '1'"	, "GREEN" , "Registro Processado")
+	oBrowse:AddLegend( "ZB0->ZB0_STATUS == '2'"	, "RED"   , "Erro no Processamento")
 
 	//Ativa a Browse
 	oBrowse:Activate()
@@ -88,7 +87,6 @@ User Function LBRWZB0()
 
 	//Monta as cores
 	AADD(aLegenda,{"BR_VERDE",   "Registro Processado"  })
-	AADD(aLegenda,{"BR_AZUL",    "Aguardando Processamento"})
 	AADD(aLegenda,{"BR_VERMELHO","Erro de Processamento"})
 
 	BrwLegenda("Monitor de Integração", "Status", aLegenda)

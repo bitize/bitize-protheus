@@ -35,6 +35,7 @@ class bitize
 	method delete(cPath,cQuery,aHeader)
 	method getResponse()
 	method getError()
+	method grvZB0(cPath,cQuery)
 
 endClass
 
@@ -219,7 +220,7 @@ method post(cPath,oJson,cQuery,aHeader,lRefresh) class bitize
 		::refresh()
 	endif
 
-  ::cRequest  := ''
+	::cRequest  := ''
 	::cResponse := ''
 	::oRet      := nil
 	::lRet      := .t.
@@ -287,6 +288,8 @@ method post(cPath,oJson,cQuery,aHeader,lRefresh) class bitize
 
 		::consoleLog(cLog,.T.)
 	endif
+
+	::grvZB0(cPath,cQuery,'POST')
 
 return ::lRet
 
@@ -384,6 +387,8 @@ method get(cPath,cQuery,aHeader,lRefresh) class bitize
 		::consoleLog(cLog,.T.)
 	endif
 
+	::grvZB0(cPath,cQuery,'GET')
+
 return ::lRet
 
 /*/{Protheus.doc} bitize::put
@@ -411,7 +416,7 @@ method put(cPath,oJson,cQuery,aHeader) class bitize
 
 	::refresh()
 
-  ::cRequest  := ''
+	::cRequest  := ''
 	::cResponse := ''
 	::oRet      := nil
 	::lRet      := .t.
@@ -475,6 +480,8 @@ method put(cPath,oJson,cQuery,aHeader) class bitize
 		::consoleLog(cLog,.T.)
 	endif
 
+	::grvZB0(cPath,cQuery,'PUT')
+
 return ::lRet
 
 /*/{Protheus.doc} bitize::delete
@@ -484,11 +491,10 @@ Método DELETE
 @author Carlos Tirabassi
 @since 03/02/2021
 @param cPath, character, Path
-@param cQuery, character, Query string
 @param aHeader, array, Headers
 @return logical, Se a integração ocorrer com sucesso retorna true
 /*/
-method delete(cPath,cQuery,aHeader) class bitize
+method delete(cPath,aHeader) class bitize
 	local oRest:= FWRest():New(::cHost)
 	local cLog:= ''
 	local aHd  := {}
@@ -509,7 +515,7 @@ method delete(cPath,cQuery,aHeader) class bitize
 		cPath:= '/' + cPath
 	endif
 
-	oRest:setPath(cPath + if(!empty(cQuery),'?'+cQuery,''))
+	oRest:setPath(cPath)
 
 	aHd:= ::aHeaders
 	for nX:=1 to len(aHeader)
@@ -559,6 +565,8 @@ method delete(cPath,cQuery,aHeader) class bitize
 		::consoleLog(cLog,.T.)
 	endif
 
+	::grvZB0(cPath,cQuery,'DELETE')
+
 return ::lRet
 
 /*/{Protheus.doc} bitize::getResponse
@@ -582,6 +590,57 @@ Retorna o erro gerado na requisição
 /*/
 method getError() class bitize
 return ::cErro
+
+/*/{Protheus.doc} bitize::grvZB0
+Grava os dados da requisição na ZB0
+@type method
+@version 1.0 
+@author Carlos Tirabassi
+@since 14/02/2021
+@param cPath, character, Path
+@param cQuery, character, Query Parameters
+/*/
+method grvZB0(cPath,cQuery,cMethod) class bitize
+	local cResource	:= ''
+	local cParam    := ''
+	local nPos 			:= 0
+
+	default cPath		:= ''
+	default cQuery	:= ''
+	default cMethod := ''
+
+	nPos:= at('/',cPath)
+
+	if nPos == 1
+		cPath	:= subStr(cPath,2,len(cPath) -1)
+		nPos	:= at('/',cPath)
+	endif
+
+	if nPos > 0
+		cResource	:= subStr(cPath,1,nPos-1)
+		cParam		:= subStr(cPath,nPos+1,len(cPath) - nPos)
+	else
+		cResource:= cPath
+	endif
+
+	ZB0->(dbSetOrder(1))
+
+	recLock('ZB0',.t.)
+	ZB0->ZB0_FILIAL	:= xFilial('ZB0')
+	ZB0->ZB0_ID			:= U_BITNUM('ZB0','ZB0_ID') 
+	ZB0->ZB0_STATUS := if(::lRet,'1','2')                                                                                                       
+	ZB0->ZB0_RESOUR	:= cResource
+	ZB0->ZB0_METHOD := cMethod
+	ZB0->ZB0_PAR		:= cParam
+	ZB0->ZB0_QUERY	:= cQuery
+	ZB0->ZB0_REQ		:= ::cRequest
+	ZB0->ZB0_RESP		:= ::cResponse
+	ZB0->ZB0_LOG		:= ::cErro
+	ZB0->ZB0_DTPROC	:= date()
+	ZB0->ZB0_HRPROC	:= time()
+	ZB0->(msUnlock())
+
+return
 
 /*/{Protheus.doc} retDif
 retorna diferença entre duas datas e horas
@@ -620,7 +679,7 @@ static function retDif(dDtIni,cHrIni,dDtFim,cHrFim)
 return (nDias * 24) + nHora
 
 /*/{Protheus.doc} Hr2Val
-Retorna a hora me formato numerico
+Retorna a hora me formato decimal
 @type function
 @version  1.0
 @author Carlos Tirabassi Jr
@@ -638,9 +697,17 @@ static function Hr2Val(cHora, cSep)
 	default cHora := ""
 	default cSep  := ':'
 
+	if len(cHora) == 8
+		cHora:=  subStr(cHora,1,5)
+	endif
+
+	if At(cSep, cHora) == 0
+		return nValor
+	endif
+
 	//Se tiver a hora
 	If !Empty(cHora)
-		nPosSep := RAt(cSep, cHora)
+		nPosSep := At(cSep, cHora)
 		nAux    := Val(SubStr(cHora, nPosSep+1, 2))
 		nAux    := Int(Round((nAux*100)/60, 0))
 		cMin    := Iif(nAux > 10, cValToChar(nAux), "0"+cValToChar(nAux))
@@ -648,7 +715,6 @@ static function Hr2Val(cHora, cSep)
 	EndIf
 
 Return nValor
-
 
 //função para testes da classe
 user function tstBtz()

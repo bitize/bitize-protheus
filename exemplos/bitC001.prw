@@ -1,10 +1,19 @@
 #include 'totvs.ch'
 
-user function bitUsua(lJob,lDelete)
+/*/{Protheus.doc} bitC001
+Cadastro de Usuário no Bitize
+@type function
+@version 1.0 
+@author Carlos Tirabassi
+@since 06/02/2021
+@param lJob, logical, Indica se está rodando via Job
+@param lDelete, logical, Indica se está deletando o registro
+@return logical, Retorna true se o processo ocorreu com sucesso
+/*/
+user function bitC001(lJob,lDelete)
 	local lRet     := .f.
 	local oUsuario := JsonObject():new()
 	local cPsw     := superGetMV('BT_DEFPSW',.f.,'')
-	local oBitize  := bitize():new()
 	local aPerfil  := {}
 	local cLog     := ''
 	local cId      := ''
@@ -12,11 +21,15 @@ user function bitUsua(lJob,lDelete)
 	default lJob      := .f.
 	default lDelete		:= .f.
 
+	if type('oBitize') == 'U'
+		oBitize  := bitize():new()
+	endif
+
 	oUsuario['external_id']      := allTrim(ZB1->ZB1_CODUSR)
 	oUsuario['first_name']       := allTrim(ZB1->ZB1_NOME)
 	oUsuario['last_name']        := allTrim(ZB1->ZB1_SOBREN)
 	oUsuario['email']            := allTrim(ZB1->ZB1_EMAIL)
-	oUsuario['active']           := if(ZB1_ATIVO=='1',.t.,.f.)
+	oUsuario['active']           := if(ZB1->ZB1_ATIVO=='1',.t.,.f.)
 	oUsuario['country_area_code']:= allTrim(ZB1->ZB1_DDI)
 	oUsuario['phone']            := allTrim(ZB1->ZB1_PHONE)
 	oUsuario['extension']        := allTrim(ZB1->ZB1_RAMAL)
@@ -106,6 +119,10 @@ user function bitUsua(lJob,lDelete)
 		ZB1->ZB1_LOG:= cLog
 		ZB1->ZB1_SIT:= '4'
 		ZB1->(msUnlock())
+	endif
+
+	if !lRet .and. !lJob
+		alert('Erro na integração: ' + cLog)
 	endif
 
 return lRet
