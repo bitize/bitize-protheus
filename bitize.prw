@@ -27,15 +27,18 @@ class bitize
 	data aHeaders   as Array
 
 	method new() CONSTRUCTOR
-	method consoleLog(cMsg,lErro)
+	method cleanUp()
 	method refresh()
+	method grvZB0(cPath,cQuery)
+	method consoleLog(cMsg,lErro)
+	method setError(oRest)
+
 	method post(cPath,oJson,cQuery,aHeader)
 	method get(cPath,cQuery,aHeader)
 	method put(oJson,cPath,cQuery,aHeader)
 	method delete(cPath,cQuery,aHeader)
 	method getResponse()
 	method getError()
-	method grvZB0(cPath,cQuery)
 
 endClass
 
@@ -74,6 +77,103 @@ method new() class bitize
 	::consoleLog('Classe instanciada com ' + if (::lRet,'sucesso!','com erros: ' + ::cErro))
 
 return Self
+
+/*/{Protheus.doc} bitize::cleanUp
+Limpa a classe da memória
+@type method
+@version 1.0 
+@author Carlos Tirabassi
+@since 20/02/2021
+/*/
+method cleanUp() class bitize
+
+	::cHost     := nil
+	::cConsumer := nil
+	::cSecret   := nil
+	::cAToken   := nil
+	::cRToken   := nil
+	::dDtAToken	:= nil
+	::cHrAToken	:= nil
+	::dDtRToken	:= nil
+	::cHrRToken := nil
+	::cRequest  := nil
+	::cResponse := nil
+	::oRet      := nil
+	::cErro     := nil
+	::aHeaders	:= nil
+
+	::consoleLog('Limpeza da instanciacao da classe executada')
+
+	::lVerb	:= nil
+	::lRet  := nil
+
+return
+
+/*/{Protheus.doc} bitize::setError
+Mensagem de erro
+@type method
+@version 1.0 
+@author Carlos Tirabassi
+@since 20/02/2021
+@param oRest, object, Objeto FWRest
+@param cPath, character, Path da requisicao
+/*/
+method setError(oRest,cPath) class bitize
+	local cLog		:= ''
+	local cAux  	:= ''
+	local cStatus	:= ''
+
+	default cPath:= ''
+
+	::oRet := nil
+
+	::cResponse:= oRest:GetResult()
+
+	if valType(::cResponse) <> 'C'
+		::cResponse:= ''
+	endif
+
+	if !empty(::cResponse)
+		::cResponse:= FWNoAccent(DecodeUtf8(::cResponse))
+
+		if empty(::cResponse)
+			::cResponse:= FWNoAccent(oRest:GetResult())
+		endif
+	endif
+
+	cAux:= FWNoAccent(DecodeUtf8(oRest:GetLastError()))
+
+	if empty(cAux)
+		cAux:= FWNoAccent(oRest:GetLastError())
+	endif
+
+	cStatus:= oRest:GetHTTPCode()
+
+	if cStatus == '401'
+		PutMV('BT_ATOKEN','')
+		PutMV('BT_RTOKEN','')
+		PutMV('BT_DTATOK','')
+		PutMV('BT_HRATOK','')
+		PutMV('BT_DTRTOK','')
+		PutMV('BT_HRRTOK','')
+
+		::cAToken   := ''
+		::cRToken   := ''
+		::dDtAToken	:= ctod('  /  /    ')
+		::cHrAToken	:= ''
+		::dDtRToken	:= ctod('  /  /    ')
+		::cHrRToken := ''
+	endif
+
+	cLog+= 'Host: ' + ::cHost + CRLF
+	cLog+= 'Operacao: ' + ProcName(1) + ' ' + cPath + CRLF
+	cLog+= 'HTTP Code: ' + cStatus + CRLF
+	cLog+= 'Erro: ' + cAux + CRLF
+	cLog+= 'Resultado: ' + ::cResponse + CRLF
+
+	::consoleLog(cLog,.T.)
+
+return
 
 /*/{Protheus.doc} bitize::consoleLog
 Rotina de geração de logs
@@ -206,7 +306,6 @@ Método HTTP Post
 /*/
 method post(cPath,oJson,cQuery,aHeader,lRefresh) class bitize
 	local oRest:= FWRest():New(::cHost)
-	local cLog := ''
 	local cPost:= ''
 	local aHd  := {}
 	local nx   := 0
@@ -267,29 +366,12 @@ method post(cPath,oJson,cQuery,aHeader,lRefresh) class bitize
 		endif
 		::consoleLog('Sucesso! Operacao: POST ' + cPath)
 	else
-		::oRet := nil
-
-		::cResponse:= FWNoAccent(DecodeUtf8(oRest:GetResult()))
-
-		if empty(::cResponse)
-			::cResponse:= FWNoAccent(oRest:GetResult())
-		endif
-
-		cAux:= FWNoAccent(DecodeUtf8(oRest:GetLastError()))
-
-		if empty(cAux)
-			cAux:= FWNoAccent(oRest:GetLastError())
-		endif
-
-		cLog+= 'Host: ' + ::cHost + CRLF
-		cLog+= 'Operacao: POST ' + cPath + CRLF
-		cLog+= 'Erro: ' + cAux + CRLF
-		cLog+= 'Resultado: ' + ::cResponse + CRLF
-
-		::consoleLog(cLog,.T.)
+		::setError(oRest,cPath)
 	endif
 
 	::grvZB0(cPath,cQuery,'POST')
+
+	FreeObj(oRest)
 
 return ::lRet
 
@@ -307,10 +389,8 @@ Método HTTP GET
 /*/
 method get(cPath,cQuery,aHeader,lRefresh) class bitize
 	local oRest := FWRest():New(::cHost)
-	local cLog	:= ''
 	local aHd  	:= {}
 	local nx   	:= 0
-	local cAux  := ''
 
 	default cPath  := ''
 	default cQuery:= ''
@@ -361,33 +441,12 @@ method get(cPath,cQuery,aHeader,lRefresh) class bitize
 		endif
 		::consoleLog('Sucesso! Operacao: GET ' + cPath)
 	else
-		::oRet := nil
-
-		if !empty(oRest:GetResult())
-			::cResponse:= FWNoAccent(DecodeUtf8(oRest:GetResult()))
-
-			if empty(::cResponse)
-				::cResponse:= FWNoAccent(oRest:GetResult())
-			endif
-		endif
-
-		if !empty(oRest:GetLastError())
-			cAux:= FWNoAccent(DecodeUtf8(oRest:GetLastError()))
-
-			if empty(cAux)
-				cAux:= FWNoAccent(oRest:GetLastError())
-			endif
-		endif
-
-		cLog+= 'Host: ' + ::cHost + CRLF
-		cLog+= 'Operacao: PUT ' + cPath + CRLF
-		cLog+= 'Erro: ' + cAux + CRLF
-		cLog+= 'Resultado: ' + ::cResponse + CRLF
-
-		::consoleLog(cLog,.T.)
+		::setError(oRest,cPath)
 	endif
 
 	::grvZB0(cPath,cQuery,'GET')
+
+	FreeObj(oRest)
 
 return ::lRet
 
@@ -405,10 +464,8 @@ Método HTTP PUT
 /*/
 method put(cPath,oJson,cQuery,aHeader) class bitize
 	local oRest:= FWRest():New(::cHost)
-	local cLog := ''
 	local cPut := ''
 	local aHd  := {}
-	local cAux := ''
 	local nx   := 0
 
 	default cQuery := ''
@@ -458,29 +515,12 @@ method put(cPath,oJson,cQuery,aHeader) class bitize
 		endif
 		::consoleLog('Sucesso! Operacao: PUT ' + cPath)
 	else
-		::oRet := nil
-
-		::cResponse:= FWNoAccent(DecodeUtf8(oRest:GetResult()))
-
-		if empty(::cResponse)
-			::cResponse:= FWNoAccent(oRest:GetResult())
-		endif
-
-		cAux:= FWNoAccent(DecodeUtf8(oRest:GetLastError()))
-
-		if empty(cAux)
-			cAux:= FWNoAccent(oRest:GetLastError())
-		endif
-
-		cLog+= 'Host: ' + ::cHost + CRLF
-		cLog+= 'Operacao: GET ' + cPath + CRLF
-		cLog+= 'Erro: ' + cAux + CRLF
-		cLog+= 'Resultado: ' + ::cResponse + CRLF
-
-		::consoleLog(cLog,.T.)
+		::setError(oRest,cPath)
 	endif
 
 	::grvZB0(cPath,cQuery,'PUT')
+
+	FreeObj(oRest)
 
 return ::lRet
 
@@ -496,9 +536,7 @@ Método DELETE
 /*/
 method delete(cPath,aHeader) class bitize
 	local oRest:= FWRest():New(::cHost)
-	local cLog:= ''
 	local aHd  := {}
-	local cAux := ''
 	local nx   := 0
 
 	default cQuery := ''
@@ -543,29 +581,12 @@ method delete(cPath,aHeader) class bitize
 		endif
 		::consoleLog('Sucesso! Operacao: DELETE ' + cPath)
 	else
-		::oRet := nil
-
-		::cResponse:= FWNoAccent(DecodeUtf8(oRest:GetResult()))
-
-		if empty(::cResponse)
-			::cResponse:= FWNoAccent(oRest:GetResult())
-		endif
-
-		cAux:= FWNoAccent(DecodeUtf8(oRest:GetLastError()))
-
-		if empty(cAux)
-			cAux:= FWNoAccent(oRest:GetLastError())
-		endif
-
-		cLog+= 'Host: ' + ::cHost + CRLF
-		cLog+= 'Operacao: DELETE ' + cPath + CRLF
-		cLog+= 'Erro: ' + cAux + CRLF
-		cLog+= 'Resultado: ' + ::cResponse + CRLF
-
-		::consoleLog(cLog,.T.)
+		::setError(oRest,cPath)
 	endif
 
 	::grvZB0(cPath,cQuery,'DELETE')
+
+	FreeObj(oRest)
 
 return ::lRet
 
@@ -627,8 +648,8 @@ method grvZB0(cPath,cQuery,cMethod) class bitize
 
 	recLock('ZB0',.t.)
 	ZB0->ZB0_FILIAL	:= xFilial('ZB0')
-	ZB0->ZB0_ID			:= U_BITNUM('ZB0','ZB0_ID') 
-	ZB0->ZB0_STATUS := if(::lRet,'1','2')                                                                                                       
+	ZB0->ZB0_ID			:= U_BITNUM('ZB0','ZB0_ID')
+	ZB0->ZB0_STATUS := if(::lRet,'1','2')
 	ZB0->ZB0_RESOUR	:= cResource
 	ZB0->ZB0_METHOD := cMethod
 	ZB0->ZB0_PAR		:= cParam
