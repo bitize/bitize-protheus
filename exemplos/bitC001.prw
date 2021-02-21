@@ -6,11 +6,12 @@ Cadastro de Usuário no Bitize
 @version 1.0 
 @author Carlos Tirabassi
 @since 06/02/2021
-@param lJob, logical, Indica se está rodando via Job
 @param lDelete, logical, Indica se está deletando o registro
+@param lJob, logical, Indica se está rodando via Job
 @return logical, Retorna true se o processo ocorreu com sucesso
 /*/
-user function bitC001(lJob,lDelete)
+user function bitC001(lDelete,lJob)
+	local aArea   := getArea()
 	local lRet     := .f.
 	local oUsuario := JsonObject():new()
 	local cPsw     := superGetMV('BT_DEFPSW',.f.,'')
@@ -18,11 +19,17 @@ user function bitC001(lJob,lDelete)
 	local cLog     := ''
 	local cId      := ''
 
-	default lJob      := .f.
 	default lDelete		:= .f.
+	default lJob      := .f.
 
+	//A classe pode ser instanciada no fonte que chama essa rotina
 	if type('oBitize') == 'U'
 		oBitize  := bitize():new()
+	endif
+
+	//A variavel cLog pode ser declarada no fonte que chama essa rotina
+	if type('cLog') == 'U'
+		cLog:= ''
 	endif
 
 	oUsuario['external_id']      := allTrim(ZB1->ZB1_CODUSR)
@@ -124,5 +131,7 @@ user function bitC001(lJob,lDelete)
 	if !lRet .and. !lJob
 		alert('Erro na integração: ' + cLog)
 	endif
+
+	restArea(aArea)
 
 return lRet

@@ -6,21 +6,28 @@ Cadastro de perfil de aprovação, a tabela DHL deve estar procisionada
 @version 1.0 
 @author Carlos Tirabassi
 @since 14/02/2021
-@param lJob, logical, indica se a rotina está sendo executada via job
-@param lDelete, logical, indica se é uma operação de exclusão
+@param lDelete, logical, Indica se está deletando o registro
+@param lJob, logical, Indica se está rodando via Job
 @return logical, Retorna true se o processo ocorreu com sucesso
 /*/
-user function bitC002(lJob,lDelete)
+user function bitC002(lDelete,lJob)
+	local aArea   := getArea()
 	local lRet    := .f.
 	local oPerfil := JsonObject():new()
 	local cLog    := ''
 	local cId     := ''
 
-	default lJob    := .f.
-	default lDelete	:= .f.
+	default lDelete		:= .f.
+	default lJob      := .f.
 
+	//A classe pode ser instanciada no fonte que chama essa rotina
 	if type('oBitize') == 'U'
 		oBitize  := bitize():new()
+	endif
+
+	//A variavel cLog pode ser declarada no fonte que chama essa rotina
+	if type('cLog') == 'U'
+		cLog:= ''
 	endif
 
 	oPerfil['external_id']:= allTrim(DHL->DHL_COD)
@@ -80,5 +87,7 @@ user function bitC002(lJob,lDelete)
 			DHL->(msUnlock())
 		endif
 	endif
+
+	restArea(aArea)
 
 return lRet
