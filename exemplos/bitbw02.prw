@@ -129,5 +129,5 @@ static function COMPPOS( oModel )
 Return lRet
 
 user function procZB1()
-	msgRun('Integrando...','Integração Bitize',{bitC001Usua()})
+	msgRun('Integrando...','Integração Bitize',{u_bitC001(.f.,.f.)})
 return
