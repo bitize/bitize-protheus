@@ -27,13 +27,18 @@ user function bitjob(aEmp,lJob)
 		return
 	endif
 
-	//Usuários
+	u_bitLog('Inicio')
+
+	u_bitLog('Cadastro de Usuarios')
 	jobUsers()
 
-	//Perfis de Aprovação
+	u_bitLog('Cadastro de Perfis de Aprovacao')
 	jobPerf()
 
-	u_bitLog('rodou')
+	u_bitLog('Cadastro de Aprovadores')
+	jobAprov()
+
+	u_bitLog('Fim')
 
 	unLockByName(cChave)
 
@@ -54,7 +59,7 @@ static function jobUsers()
 	private oBitize:= bitize():new()
 
 	if !oBitize:lRet
-		u_bitLog('Erro ao carregar a classe do Bitize')
+		u_bitLog('Erro ao carregar a classe de comunicacao com o Bitize')
 		return
 	endif
 
@@ -70,6 +75,9 @@ static function jobUsers()
 
 	ZB1->(dbCloseArea())
 
+	oBitize:cleanUp()
+	freeObj(oBitize)
+
 return
 
 /*/{Protheus.doc} jobPerf
@@ -83,7 +91,7 @@ static function jobPerf()
 	private oBitize:= bitize():new()
 
 	if !oBitize:lRet
-		u_bitLog('Erro ao carregar a classe do Bitize')
+		u_bitLog('Erro ao carregar a classe de comunicacao com o Bitize')
 		return
 	endif
 
@@ -96,4 +104,42 @@ static function jobPerf()
 
 		DHL->(dbSkip())
 	enddo
+
+	DHL->(dbCloseArea())
+
+	oBitize:cleanUp()
+	freeObj(oBitize)
+
+return
+
+/*/{Protheus.doc} jobAprov
+JCadastro de Aprovadores
+@type function
+@version 1.0 
+@author Carlos Tirabassi
+@since 20/02/2021
+/*/
+static function jobAprov()
+	private oBitize:= bitize():new()
+
+	if !oBitize:lRet
+		u_bitLog('Erro ao carregar a classe de comunicacao com o Bitize')
+		return
+	endif
+
+	SAK->(dbSetOrder(1))
+	while SAK->(!eof())
+
+		if SAK->AK_XBTSIT <> '2'
+			u_bitC003()
+		endif
+
+		SAK->(dbSkip())
+	enddo
+
+	SAK->(dbCloseArea())
+
+	oBitize:cleanUp()
+	freeObj(oBitize)
+
 return
